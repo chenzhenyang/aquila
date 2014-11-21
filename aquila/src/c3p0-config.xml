@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<c3p0-config>
+	  <named-config name="source">
+		<property name="driverClass">com.microsoft.sqlserver.jdbc.SQLServerDriver
+		</property>
+		<property name="jdbcUrl">jdbc:sqlserver://192.168.100.8:1433;DatabaseName=CMSV51
+		</property>
+		<property name="user">sa</property>
+		<property name="password">highgo@hg123</property>
+		<property name="maxPoolSize">40</property>
+		<!--<property name="checkoutTimeout">1000</property>-->
+	</named-config>
+	<!--<named-config name="source">
+		<property name="driverClass">com.microsoft.sqlserver.jdbc.SQLServerDriver
+		</property>
+		<property name="jdbcUrl">jdbc:sqlserver://192.168.100.133:1433;DatabaseName=ContinuousTable
+		</property>
+		<property name="user">sa</property>
+		<property name="password">highgo</property>
+		<property name="checkoutTimeout">1000</property>
+		<property name="preferredTestQuery"><value>SELECT 1</value></property>
+	</named-config>
+-->
+	<named-config name="postgres">
+		<property name="driverClass">org.postgresql.Driver</property>
+		<!-- <property name="jdbcUrl">jdbc:postgresql://192.168.100.8:5432/test</property> -->
+		<property name="jdbcUrl">jdbc:postgresql://192.168.100.6:5866/test
+		</property>
+		<property name="user">test</property>
+		<property name="password">test</property>
+
+		<!-- <property name="checkoutTimeout">1000</property> -->
+		<!--这个值必须设置成这样 -->
+		<!-- <property name="maxIdleTime">1</property> -->
+		<!--这个值必须设置成这样 -->
+		<!--<property name="acquireRetryAttempts">1</property>-->
+		<!--这个值必须设置成这样 -->
+		<!-- <property name="idleConnectionTestPeriod">1</property> -->
+		<!-- maxPoolSize= numWriteThread + 1（ReInsert） -->
+		<property name="maxPoolSize">30</property>
+		<!--<property name="preferredTestQuery"><value>SELECT 1</value></property>-->
+	</named-config>
+</c3p0-config>
