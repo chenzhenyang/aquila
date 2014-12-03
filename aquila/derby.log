@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Sat Nov 22 18:54:23 CST 2014:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.8.3.2 - (1557835): instance a816c00e-0149-d723-6bc6-000006a7a440 
+on database directory D:\aquila\aquila\db  with class loader sun.misc.Launcher$AppClassLoader@2b54ae5a 
+Loaded from file:/D:/aquila/aquila/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_67-b01
+user.dir=D:\aquila\aquila
+os.name=Windows 7
+os.arch=amd64
+os.version=6.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
