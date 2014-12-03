@@ -312,7 +312,9 @@ public class DerbyUtil {
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
 		 DerbyUtil t = new DerbyUtil();
 //		 loadDriver();
-		 DerbyUtil.createTable2();
+//		 DerbyUtil.createTable2();
+		 System.out.println(DerbyUtil.getSize2());
+		 DerbyUtil.delete2();
 //		 t.doIt();
 
 		// Integer in = new Integer(1);

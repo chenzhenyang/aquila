@@ -5,6 +5,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 
 import com.highgo.hgdbadmin.model.Table;
+import com.highgo.hgdbadmin.myutil.Constants;
 import com.highgo.hgdbadmin.myutil.MemoryTool;
 import com.highgo.hgdbadmin.myutil.MigrateCenter;
 import com.highgo.hgdbadmin.myutil.ShellEnvironment;

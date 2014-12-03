@@ -31,6 +31,7 @@ import com.highgo.hgdbadmin.model.Trigger;
 import com.highgo.hgdbadmin.model.View;
 import com.highgo.hgdbadmin.vthread.MainThread;
 
+@Deprecated
 public class MigrateCenter {
 
 	private static Logger logger = Logger.getLogger(MigrateCenter.class);
@@ -86,10 +87,6 @@ public class MigrateCenter {
 			MainThread.migrateTable(table.schema, table.name, threadnum, recInMemory, batchSize);
 		}
 		// migrate index
-		System.out.println(indexes.size());
-		for (Index index : indexes) {
-			System.out.println(index.toSql());
-		}
 		for (Index index : indexes) {
 			createIndex(index);
 		}
@@ -340,6 +337,8 @@ public class MigrateCenter {
 			while (rs.next()) {
 				tab = new Table(rs.getString("TABLE_SCHEMA"), rs.getString("TABLE_NAME"), rs.getString("TABLE_TYPE"));
 			}
+			tab.columns = fetchColumnsForATable(schema, table);
+			tab.keys = fetchPrimaryKeysForATable(schema, table);
 			logger.info("TABLE:" + tab);
 			rs.close();
 			ps.close();

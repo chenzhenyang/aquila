@@ -3,8 +3,10 @@ package com.highgo.hgdbadmin.log;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.highgo.hgdbadmin.myutil.DBUtil;
+import com.highgo.hgdbadmin.reportable.TableDetail;
 import com.highgo.hgdbadmin.vthread.Record;
 
 /**
@@ -18,10 +20,12 @@ public class ReInsert implements Runnable {
 	private long sleepTime = 100;
 	private CountDownLatch startGate;
 	private CountDownLatch endGate;
+	private TableDetail tableDetail;
 
-	public ReInsert(CountDownLatch endGate, CountDownLatch startGate) {
+	public ReInsert(CountDownLatch endGate, CountDownLatch startGate, TableDetail tableDetail) {
 		this.startGate = startGate;
 		this.endGate = endGate;
+		this.tableDetail = tableDetail;
 	}
 
 	@Override
@@ -42,12 +46,12 @@ public class ReInsert implements Runnable {
 	}
 
 	public void doAction() throws ClassNotFoundException, SQLException, IOException {
+		AtomicLong al = new AtomicLong(0);
 		/**
-		 * 如果有活着的线程||Derby中有数据
-		 * lives() > 1,有活着的线程，这时可能Derby中没有数据，但是要线程不能结束，要一直检测
+		 * 如果有活着的线程||Derby中有数据 lives() > 1,有活着的线程，这时可能Derby中没有数据，但是要线程不能结束，要一直检测
 		 * DerbyUtil.getSize2() != 0，说明Derby中有数据，这个时候不论是不是有线程在运行，都要继续处理。
 		 */
-		
+
 		while (lives() > 1 || DerbyUtil.getSize2() != 0) {// 还有线程活着，接着干,这个1是本线程自己
 			if (Constant.ROWSNUM.get() != 0) {
 				try {
@@ -57,19 +61,17 @@ public class ReInsert implements Runnable {
 				Record r = record.get();
 				try {
 					DBUtil.insert(r);
+					// 下面这句代码的位置极其精粹，如果insert成功，则这行代码就执行，如果不成功，这行代码就不执行了。
+
 				} catch (SQLException e) {
+					al.decrementAndGet();
 					// TODO
 					// 将插入失败的对象写入到最终文件中，要计数，错误超过一定的数量，就建议用户重新迁移，
 					// 同时给用户一定的建议，比如数据库连接检查，表模式的修改等等
 					if (e instanceof SQLException) {
 						try {
-//							System.out
-//									.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 							Log.writeObject(r);
-//							System.out
-//									.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 						} catch (IOException e1) {
-							// e1.printStackTrace();
 						}
 					}
 				}
@@ -80,6 +82,7 @@ public class ReInsert implements Runnable {
 				}
 			}
 		}
+		this.tableDetail.totalDerby = al.get();
 	}
 
 	private long lives() {

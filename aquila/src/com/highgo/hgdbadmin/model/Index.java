@@ -46,6 +46,15 @@ public class Index {
 		return this.schema + "." + this.name;
 	}
 
+	public String toString2() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[" + this.schema + "." + this.name + "] on [" + this.schema + "." + this.table + "]\n");
+		sb.append("unique:" + this.unique + "\n");
+		sb.append("columns:" + this.columns + "\n");
+		sb.append("isDescendingKeys:" + this.isDescendingKeys + "\n");
+		return sb.toString();
+	}
+
 	@Override
 	public int hashCode() {
 		return name.hashCode();
@@ -74,7 +83,7 @@ public class Index {
 				sb.append(columns.get(i) + " " + (isDescendingKeys.get(i) == false ? "ASC" : "DESC") + ",");
 			}
 		}
-		
+
 		sb.append(columns.get(columns.size() - 1) + " "
 				+ (isDescendingKeys.get(isDescendingKeys.size() - 1) == false ? "ASC" : "DESC"));
 

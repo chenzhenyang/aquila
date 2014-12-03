@@ -1,3 +1,4 @@
+package com.highgo.hgdbadmin.myutil;
 import java.util.LinkedList;
 import java.util.List;
 

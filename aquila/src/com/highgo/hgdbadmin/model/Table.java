@@ -42,6 +42,15 @@ public class Table {
 
 	@Override
 	public String toString() {
-		return this.schema+"."+this.name;
+		return this.schema + "." + this.name;
+	}
+
+	public String toString2() { 
+		StringBuilder sb = new StringBuilder();
+		sb.append("[" + this.schema + "." + this.name + "]");
+		sb.append(" type:" + type + "\n");
+		sb.append("columns:" + columns+"\n");
+		sb.append("keys:" + this.keys);
+		return sb.toString();
 	}
 }

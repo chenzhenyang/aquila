@@ -9,12 +9,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
 import com.highgo.hgdbadmin.log.DerbyUtil;
 import com.highgo.hgdbadmin.myutil.C3P0Util;
 import com.highgo.hgdbadmin.myutil.DBUtil;
+import com.highgo.hgdbadmin.reportable.TableDetail;
 
 public class WriteThread implements Runnable {
 
@@ -27,13 +29,18 @@ public class WriteThread implements Runnable {
 	private String toTable;
 
 	private int batchSize;
-
+	private AtomicLong al;
+	private TableDetail tableDetail;
+	
 	private List<Record> redo;
 
 	private Connection conn;
+	
+	
+	
 
 	public WriteThread(CountDownLatch startGate, CountDownLatch endGate, Buffer<Record> buffer, String toSchema,
-			String toTable, int batchSize) {
+			String toTable, int batchSize,AtomicLong al,TableDetail tableDetail) {
 		try {
 			this.conn = C3P0Util.getInstance().getConnection(C3P0Util.POSTGRES);
 		} catch (SQLException e) {
@@ -49,6 +56,8 @@ public class WriteThread implements Runnable {
 		this.toSchema = toSchema;
 		this.toTable = toTable;
 		this.batchSize = batchSize;
+		this.al = al;
+		this.tableDetail = tableDetail;
 		this.redo = new LinkedList<>();
 	}
 
@@ -65,6 +74,7 @@ public class WriteThread implements Runnable {
 	}
 
 	private void doAction() throws InterruptedException {
+		List<String> errors = new LinkedList<>();
 		Date start = new Date();
 		Lock.cdl.await();
 		PreparedStatement ps = null;
@@ -73,6 +83,7 @@ public class WriteThread implements Runnable {
 			String sql = makeSql(toSchema, toTable);
 			ps = conn.prepareStatement(sql);
 		} catch (SQLException e1) {
+			errors.add(e1.getMessage());
 			logger.error(e1.getMessage());
 		}
 		redo.clear();
@@ -111,12 +122,15 @@ public class WriteThread implements Runnable {
 					if (m % batchSize == 0 || buffer.size() == 0) {
 						ps.executeBatch();
 						conn.commit();
+						//这一行代码特别神奇，如果conn.commit成功，就加上这个redo.size(),如果conn.commit失败，则这句代码不会被执行，直接跳到catch里边去了，然后就是ReInsert线程的事情了
+						al.addAndGet(redo.size());
 						redo.clear();// 如果能走到这一行代码，说明提交成功了，然后把redo list清空
 					}
 				} catch (SQLException e) {
 					// 没有插入成功的记录插入到derby中
 					// 在这个地方需要清空连接池中没用的连接，不然一个失败的建立一个连接，很快就超过pgserver的max-connection了
 					logger.info(e.getMessage());
+					errors.add(e.getMessage());
 					try {
 						DerbyUtil.insertBatch2(redo);
 						redo.clear();
@@ -128,6 +142,7 @@ public class WriteThread implements Runnable {
 						}
 					} catch (SQLException | IOException e1) {
 						logger.error(e.getMessage());
+						errors.add(e.getMessage());
 					}
 				}
 			}
@@ -140,6 +155,8 @@ public class WriteThread implements Runnable {
 		Date end = new Date();
 		long result = end.getTime() - start.getTime();
 		logger.info("线程" + Thread.currentThread().getName() + "结束！ 耗时：" + result + "ms");
+		errors.clear();
+		tableDetail.baseInfo.causes.addAll(errors);
 	}
 
 	public String makeSql(String schema, String table) {

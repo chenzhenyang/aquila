@@ -45,5 +45,17 @@ public class Sequence {
 	public String toString() {
 		return this.schema + "." + this.name;
 	}
+	
+	public String toString2() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("["+schema+"."+name+"]");
+		sb.append("\nstartValue:"+startValue);
+		sb.append("\nminimumValue:"+minimumValue);
+		sb.append("\nmaximunValue:"+maximunValue);
+		sb.append("\nincrement:"+increment);
+		sb.append("\nstartValue:"+startValue);
+		sb.append("\ncycle_option:"+cycle_option);
+		return sb.toString();
+	}
 
 }

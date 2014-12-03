@@ -23,4 +23,11 @@ public class View {
 	public String toString() {
 		return this.schema+"."+this.name;
 	}
+	
+	public String toString2() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("["+schema+"."+name+"]\n");
+		sb.append("definition:"+this.definition+"\n");
+		return sb.toString();
+	}
 }

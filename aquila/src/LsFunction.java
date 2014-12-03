@@ -20,6 +20,7 @@ import com.highgo.hgdbadmin.model.Sequence;
 import com.highgo.hgdbadmin.model.Table;
 import com.highgo.hgdbadmin.model.Trigger;
 import com.highgo.hgdbadmin.model.View;
+import com.highgo.hgdbadmin.myutil.Constants;
 import com.highgo.hgdbadmin.myutil.MigrateCenter;
 import com.highgo.hgdbadmin.myutil.MigrateConstraint;
 import com.mchange.v2.c3p0.ComboPooledDataSource;

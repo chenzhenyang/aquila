@@ -13,6 +13,8 @@ import org.codehaus.groovy.tools.shell.Groovysh;
 import org.codehaus.groovy.tools.shell.IO.Verbosity;
 
 import com.highgo.hgdbadmin.log.DerbyUtil;
+import com.highgo.hgdbadmin.myutil.Constants;
+import com.highgo.hgdbadmin.myutil.InitialSourceList;
 import com.highgo.hgdbadmin.myutil.ShellEnvironment;
 
 public final class AquilaShell {
@@ -47,13 +49,8 @@ public final class AquilaShell {
 		shell.register(new StartCommand(shell));
 		shell.register(new DeleteCommand(shell));
 
-		
-		try{
-			DerbyUtil.createTable2();	
-		}catch(SQLException e){
-			
-		}
-		
+		before();
+
 		// Configure shared shell io object
 		ShellEnvironment.setIo(shell.getIo());
 
@@ -74,13 +71,21 @@ public final class AquilaShell {
 			}
 			interpretFileContent(script, shell);
 		}
-		
-		
-		
+
+	}
+
+	private static void before() {
+		try {
+			DerbyUtil.createTable2();
+		} catch (SQLException e) {
+
+		}
+		InitialSourceList.initialSourceObjectList();
 	}
 
 	/**
 	 * 执行脚本文件
+	 * 
 	 * @param script
 	 * @param shell
 	 * @throws IOException
